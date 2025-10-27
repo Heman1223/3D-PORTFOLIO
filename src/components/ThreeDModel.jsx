@@ -8,46 +8,13 @@ function ThreeDModel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [canvasOpacity, setCanvasOpacity] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
-
-  // Device detection - SUPER OPTIMIZED FOR MOBILE
-  useEffect(() => {
-    const checkDevice = () => {
-      const mobile = window.innerWidth <= 768;
-      setIsMobile(mobile);
-
-      // Detect low-end devices (older phones, less RAM)
-      const isLowEnd =
-        mobile &&
-        (window.devicePixelRatio > 2 || // High DPI but might be low performance
-          !window.matchMedia("(min-resolution: 2dppx)").matches || // Low resolution screen
-          navigator.hardwareConcurrency < 4 || // Less than 4 CPU cores
-          navigator.deviceMemory < 4); // Less than 4GB RAM
-      setIsLowEndDevice(isLowEnd);
-    };
-
-    checkDevice();
-    window.addEventListener("resize", checkDevice);
-    return () => window.removeEventListener("resize", checkDevice);
-  }, []);
 
   // Easing function for smoother progress
   const easeInOutQuad = (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
 
-  // Preload images - EXTREME MOBILE OPTIMIZATION
+  // Preload images
   useEffect(() => {
-    // DRAMATICALLY REDUCE FRAMES FOR MOBILE
-    let totalFrames;
-    if (isLowEndDevice) {
-      totalFrames = 20; // Very few frames for low-end devices
-    } else if (isMobile) {
-      totalFrames = 30; // Reduced frames for regular mobile
-    } else {
-      totalFrames = 79; // Full frames for desktop
-    }
-
+    const totalFrames = 79;
     const loadedImages = new Array(totalFrames);
 
     const createPlaceholder = (width, height, frameNum) => {
@@ -56,17 +23,21 @@ function ThreeDModel() {
       canvas.height = height;
       const ctx = canvas.getContext("2d");
 
-      // Simple gradient - less processing
-      ctx.fillStyle = "#0f1419";
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, "#1a1a2e");
+      gradient.addColorStop(1, "#16213e");
+      ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = "#4a90e2";
-      ctx.font = "bold 20px Arial";
+      ctx.fillStyle = "#66fcf1";
+      ctx.font = "bold 48px Arial";
       ctx.textAlign = "center";
-      ctx.fillText(`${frameNum}`, width / 2, height / 2);
+      ctx.fillText(`Frame ${frameNum}`, width / 2, height / 2);
 
       const img = new Image();
       img.src = canvas.toDataURL();
+      img.width = width;
+      img.height = height;
       return img;
     };
 
@@ -77,65 +48,36 @@ function ThreeDModel() {
 
         img.onload = () => {
           loadedImages[index - 1] = img;
-          setLoadingProgress(Math.floor((index / totalFrames) * 100));
+          console.log(`✅ Loaded frame ${index}/${totalFrames}`);
           resolve(true);
         };
 
         img.onerror = () => {
-          console.warn(`Failed to load frame ${index}, using placeholder`);
-          // Much smaller placeholders for mobile
-          const width = isMobile ? 320 : 800;
-          const height = isMobile ? 240 : 600;
-          loadedImages[index - 1] = createPlaceholder(width, height, index);
-          setLoadingProgress(Math.floor((index / totalFrames) * 100));
+          console.warn(`❌ Failed to load frame ${index}, using placeholder`);
+          loadedImages[index - 1] = createPlaceholder(800, 600, index);
           resolve(false);
         };
 
-        // Use optimized frame paths
-        let imagePath;
-        if (isLowEndDevice) {
-          imagePath = `/video-frames/mobile-low/frame_${String(
-            frameNumber
-          ).padStart(4, "0")}.jpg`;
-        } else if (isMobile) {
-          imagePath = `/video-frames/mobile/frame_${String(
-            frameNumber
-          ).padStart(4, "0")}.jpg`;
-        } else {
-          imagePath = `/video-frames/frame_${String(frameNumber).padStart(
-            4,
-            "0"
-          )}.jpg`;
-        }
+        img.src = `/video-frames/frame_${String(frameNumber).padStart(4, '0')}.jpg`;
 
-        img.src = imagePath;
+        console.log(`📄 Loading: ${img.src}`);
       });
     };
 
     const loadAllImages = async () => {
       setIsLoading(true);
       setError(null);
-      setLoadingProgress(0);
 
       try {
-        // Load in batches for better performance
-        const batchSize = isMobile ? 5 : 10;
-        for (let i = 1; i <= totalFrames; i += batchSize) {
-          const batchPromises = [];
-          for (let j = i; j < Math.min(i + batchSize, totalFrames + 1); j++) {
-            batchPromises.push(loadImage(j));
-          }
-          await Promise.all(batchPromises);
-
-          // Small delay between batches to prevent blocking
-          if (isMobile) {
-            await new Promise((resolve) => setTimeout(resolve, 50));
-          }
+        const loadPromises = [];
+        for (let i = 1; i <= totalFrames; i++) {
+          loadPromises.push(loadImage(i));
         }
 
+        await Promise.all(loadPromises);
         setImages(loadedImages.filter((img) => img !== undefined));
         setIsLoading(false);
-        setLoadingProgress(100);
+        console.log("🎬 All images processed");
       } catch (err) {
         setError("Failed to load images");
         setIsLoading(false);
@@ -144,20 +86,18 @@ function ThreeDModel() {
     };
 
     loadAllImages();
-  }, [isMobile, isLowEndDevice]);
+  }, []);
 
-  // Setup canvas and scroll handling - SUPER SMOOTH MOBILE
+  // Setup canvas and scroll handling
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || images.length === 0) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    let animationFrameId;
-    let lastScrollTime = 0;
-    const scrollThrottle = isMobile ? 32 : 16; // 30fps on mobile, 60fps on desktop
+    const isMobile = window.innerWidth <= 768;
 
     const setCanvasSize = () => {
-      const dpr = isMobile ? 1 : Math.min(2, window.devicePixelRatio || 1); // Limit DPR for performance
+      const dpr = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = window.innerWidth + "px";
@@ -172,49 +112,45 @@ function ThreeDModel() {
     canvas.style.left = "0";
     canvas.style.zIndex = "1";
     canvas.style.pointerEvents = "none";
+    canvas.style.transition = "opacity 0.5s ease";
 
-    const renderFrame = (frameIndex) => {
+    const renderFrame = (frameIndex, progress = 0) => {
       if (images.length === 0) {
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         return;
       }
 
-      const actualFrameIndex = Math.min(
-        Math.floor(frameIndex),
-        images.length - 1
-      );
-      const img = images[actualFrameIndex] || images[0];
+      const baseFrame = Math.floor(frameIndex);
+      const nextFrame = Math.min(baseFrame + 1, images.length - 1);
+      const img1 = images[baseFrame] || images[0];
+      const img2 = images[nextFrame] || img1;
 
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       const canvasRatio = window.innerWidth / window.innerHeight;
-      const imgRatio = img.width / img.height;
+      const imgRatio = img1.width / img1.height;
 
       let width, height, x, y;
 
-      // ULTRA SIMPLE RENDERING FOR MOBILE
-      if (isMobile) {
-        // Always use cover behavior - simplest calculation
+      // MOBILE FIX: Use cover behavior to ensure full image is visible
+      if (window.innerWidth <= 768) {
+        // On mobile, cover the entire viewport
         if (imgRatio > canvasRatio) {
-          width = window.innerWidth;
-          height = width / imgRatio;
-          x = 0;
-          y = (window.innerHeight - height) / 2;
-        } else {
+          // Image is wider - fit to height
           height = window.innerHeight;
           width = height * imgRatio;
           x = (window.innerWidth - width) / 2;
           y = 0;
+        } else {
+          // Image is taller - fit to width
+          width = window.innerWidth;
+          height = width / imgRatio;
+          x = 0;
+          y = (window.innerHeight - height) / 2;
         }
-
-        // DISABLE all image smoothing for maximum mobile performance
-        ctx.imageSmoothingEnabled = false;
-        ctx.mozImageSmoothingEnabled = false;
-        ctx.webkitImageSmoothingEnabled = false;
-        ctx.msImageSmoothingEnabled = false;
       } else {
-        // Desktop rendering with optimizations
+        // Desktop behavior - same as before
         if (imgRatio > canvasRatio) {
           width = window.innerWidth;
           height = width / imgRatio;
@@ -226,20 +162,23 @@ function ThreeDModel() {
           x = (window.innerWidth - width) / 2;
           y = 0;
         }
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "medium"; // Not high for performance
       }
 
-      ctx.drawImage(img, x, y, width, height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      if (progress > 0 && img1 !== img2) {
+        ctx.globalAlpha = 1 - progress;
+        ctx.drawImage(img1, x, y, width, height);
+        ctx.globalAlpha = progress;
+        ctx.drawImage(img2, x, y, width, height);
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.drawImage(img1, x, y, width, height);
+      }
     };
 
     const handleScroll = () => {
-      const currentTime = Date.now();
-      if (currentTime - lastScrollTime < scrollThrottle) {
-        return; // Throttle scroll events
-      }
-      lastScrollTime = currentTime;
-
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = document.getElementById("hero");
@@ -250,13 +189,14 @@ function ThreeDModel() {
       const heroHeight = heroSection.offsetHeight;
       const heroTop = heroSection.offsetTop;
       const aboutTop = aboutSection.offsetTop;
+      const aboutHeight = aboutSection.offsetHeight;
 
-      // Simplified fade calculation
-      const fadeStart = heroTop + heroHeight * 0.3;
-      const fadeEnd = aboutTop + 200;
+      const fadeStart = heroTop + heroHeight * 0.5;
+      const fadeEnd = aboutTop + aboutHeight * 0.8;
       const fadeDistance = fadeEnd - fadeStart;
 
       let opacity = 1;
+
       if (scrollTop > fadeStart) {
         opacity = Math.max(0, 1 - (scrollTop - fadeStart) / fadeDistance);
         setCanvasOpacity(opacity);
@@ -275,36 +215,40 @@ function ThreeDModel() {
           progress = easeInOutQuad(progress);
         }
 
-        const frameIndex = progress * (images.length - 1);
-        setCurrentFrame(frameIndex);
+        const frameIndex = Math.floor(progress * (images.length - 1));
+        const subProgress = progress * (images.length - 1) - frameIndex;
 
-        // Use requestAnimationFrame for smooth rendering
-        if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-        }
-        animationFrameId = requestAnimationFrame(() => {
-          renderFrame(frameIndex);
-        });
+        setCurrentFrame(frameIndex);
+        renderFrame(frameIndex, subProgress);
       }
 
       canvas.style.opacity = opacity;
     };
 
-    // Passive scroll listener for better performance
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", setCanvasSize);
-
-    // Initial render
-    renderFrame(0);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", setCanvasSize);
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+    let ticking = false;
+    const throttledScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-  }, [images, isMobile]);
+
+    renderFrame(0);
+
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      setCanvasSize();
+      handleScroll();
+    });
+
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+      window.removeEventListener("resize", setCanvasSize);
+    };
+  }, [images, currentFrame]);
 
   return (
     <div className="canvas-container">
@@ -312,26 +256,16 @@ function ThreeDModel() {
         <div className="loading-overlay">
           <div className="loading-content">
             <div className="loading-text">
-              {isLowEndDevice
-                ? "🔄 Lite Mode"
-                : isMobile
-                ? "📱 Mobile Optimized"
-                : "💻 Loading"}
-              ... {loadingProgress}%
+              Loading 3D Animation... {images.filter((img) => img).length}/79
             </div>
             <div className="loading-bar">
               <div
                 className="loading-progress"
                 style={{
-                  width: `${loadingProgress}%`,
+                  width: `${(images.filter((img) => img).length / 79) * 100}%`,
                 }}
               ></div>
             </div>
-            {isLowEndDevice && (
-              <div className="loading-info">
-                Using performance mode for smooth experience
-              </div>
-            )}
           </div>
         </div>
       )}
