@@ -12,30 +12,61 @@
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Always 3 columns */
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
   margin-top: 60px;
 }
 
-.project-card {
-  background: var(--bg-primary);
-  border-radius: 15px;
-  border: 1px solid var(--border-light);
-  transition: all 0.4s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+/* 3D Card Styles */
+.project-card-3d {
   height: 450px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  perspective: 1000px;
+  cursor: pointer;
 }
 
-.project-card:hover {
+.project-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.project-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.project-card-front {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+}
+
+.project-card-front:hover {
   transform: translateY(-8px);
   border-color: var(--accent-primary);
   box-shadow: 0 20px 50px rgba(74, 144, 226, 0.25);
 }
 
-/* Header Section - Subtle Professional */
+.project-card-back {
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  border: 1px solid var(--accent-primary);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+/* Header Section */
 .project-header {
   background: var(--bg-primary);
   padding: 22px 25px;
@@ -55,7 +86,7 @@
   transition: width 0.3s ease;
 }
 
-.project-card:hover .project-header::after {
+.project-card-front:hover .project-header::after {
   width: 80px;
 }
 
@@ -70,7 +101,7 @@
   transition: color 0.3s ease;
 }
 
-.project-card:hover .project-header h2 {
+.project-card-front:hover .project-header h2 {
   color: var(--accent-secondary);
 }
 
@@ -92,43 +123,22 @@
   transition: all 0.4s ease;
 }
 
-.project-card:hover .project-video {
+.project-card-front:hover .project-video {
   filter: brightness(1);
   transform: scale(1.03);
 }
 
-.video-status {
+.flip-hint {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  bottom: 15px;
+  right: 15px;
   background: rgba(0, 0, 0, 0.8);
-  padding: 4px 10px;
-  border-radius: 15px;
-  color: white;
-  font-size: 11px;
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  background: #4ade80;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  color: var(--accent-tertiary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
 }
 
 /* Footer Section */
@@ -155,24 +165,106 @@
   max-height: 4.5em;
 }
 
-/* Responsive Design - Only stack on mobile */
+/* Back of Card - Stats */
+.stats-container {
+  width: 100%;
+  text-align: center;
+}
+
+.stats-container h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  color: var(--accent-secondary);
+  margin-bottom: 30px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-item {
+  background: var(--bg-primary);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-primary);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  font-family: "Playfair Display", serif;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.back-button {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+}
+
+/* Tablet View */
 @media (max-width: 1024px) {
   .projects-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
-    gap: 25px;
-  }
-}
-@media (max-width: 768px) {
-  .projects-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 25px;
   }
 
-  .project-card {
+  .project-card-3d {
+    height: 420px;
+  }
+}
+
+/* Mobile View - CRITICAL FIXES */
+@media (max-width: 768px) {
+  .projects {
+    padding: 60px 15px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin-top: 40px;
+  }
+
+  .project-card-3d {
     height: auto;
     min-height: 400px;
+    max-width: 100%;
     margin: 0 auto;
-    max-width: 400px;
+  }
+
+  .project-card-inner {
+    /* Disable 3D effects on mobile for better performance */
+    transform: none !important;
+  }
+
+  .project-card-front,
+  .project-card-back {
+    position: relative;
+    transform: none !important;
   }
 
   .video-container {
@@ -181,7 +273,7 @@
 
   .project-header,
   .project-footer {
-    padding: 20px;
+    padding: 18px 20px;
   }
 
   .project-header h2 {
@@ -189,6 +281,85 @@
   }
 
   .project-description {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .flip-hint {
+    font-size: 11px;
+    padding: 6px 12px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  /* Stats on mobile */
+  .stats-container h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-item {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .back-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .projects {
+    padding: 50px 10px;
+  }
+
+  .project-card-3d {
+    min-height: 380px;
+  }
+
+  .video-container {
+    height: 180px;
+  }
+
+  .project-header h2 {
+    font-size: 16px;
+  }
+
+  .project-description {
+    font-size: 12px;
+  }
+
+  .stats-container h3 {
+    font-size: 20px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .project-card-inner {
+    transition: none !important;
   }
 }

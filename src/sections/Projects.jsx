@@ -3,7 +3,7 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
 import "../styles/projects.css";
 
-function Projects() { // CHANGED: Renamed from EnhancedProjects to Projects
+function Projects() {
   const [flippedCard, setFlippedCard] = useState(null);
   const [ref, inView] = useInView({
     threshold: 0.2,
@@ -60,6 +60,7 @@ function Projects() { // CHANGED: Renamed from EnhancedProjects to Projects
 
     const handleMouseMove = (e) => {
       if (flippedCard === index) return;
+      if (window.innerWidth <= 768) return; // Disable on mobile
       
       const rect = e.currentTarget.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -93,20 +94,20 @@ function Projects() { // CHANGED: Renamed from EnhancedProjects to Projects
           stiffness: 100,
         }}
         style={{
-          perspective: 1000,
+          perspective: window.innerWidth > 768 ? 1000 : 'none',
         }}
       >
         <motion.div
           className="project-card-inner"
           style={{
-            rotateX: isFlipped ? 0 : rotateX,
-            rotateY: isFlipped ? 180 : rotateY,
-            transformStyle: "preserve-3d",
+            rotateX: window.innerWidth > 768 && !isFlipped ? rotateX : 0,
+            rotateY: window.innerWidth > 768 ? (isFlipped ? 180 : rotateY) : 0,
+            transformStyle: window.innerWidth > 768 ? "preserve-3d" : "flat",
           }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={() => setFlippedCard(isFlipped ? null : index)}
-          whileHover={{ scale: isFlipped ? 1 : 1.02 }}
+          whileHover={window.innerWidth > 768 ? { scale: isFlipped ? 1 : 1.02 } : {}}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
           {/* Front of card */}
@@ -234,154 +235,8 @@ function Projects() { // CHANGED: Renamed from EnhancedProjects to Projects
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .project-card-3d {
-          height: 450px;
-          perspective: 1000px;
-          cursor: pointer;
-        }
-
-        .project-card-inner {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transition: transform 0.8s;
-          transform-style: preserve-3d;
-        }
-
-        .project-card-face {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          backface-visibility: hidden;
-          border-radius: 15px;
-          overflow: hidden;
-        }
-
-        .project-card-front {
-          background: var(--bg-primary);
-          border: 1px solid var(--border-light);
-          display: flex;
-          flex-direction: column;
-        }
-
-        .project-card-back {
-          background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-          border: 1px solid var(--accent-primary);
-          transform: rotateY(180deg);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 30px;
-        }
-
-        .flip-hint {
-          position: absolute;
-          bottom: 15px;
-          right: 15px;
-          background: rgba(0, 0, 0, 0.8);
-          color: var(--accent-tertiary);
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 600;
-          backdrop-filter: blur(10px);
-        }
-
-        .stats-container {
-          width: 100%;
-          text-align: center;
-        }
-
-        .stats-container h3 {
-          font-family: "Playfair Display", serif;
-          font-size: 28px;
-          color: var(--accent-secondary);
-          margin-bottom: 30px;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-
-        .stat-item {
-          background: var(--bg-primary);
-          padding: 20px;
-          border-radius: 12px;
-          border: 1px solid var(--accent-primary);
-        }
-
-        .stat-value {
-          font-size: 32px;
-          font-weight: 700;
-          color: var(--accent-secondary);
-          font-family: "Playfair Display", serif;
-          margin-bottom: 8px;
-        }
-
-        .stat-label {
-          font-size: 13px;
-          color: var(--text-secondary);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-weight: 600;
-        }
-
-        .back-button {
-          background: var(--gradient-primary);
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          font-size: 14px;
-          transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
-        }
-
-        @media (max-width: 1024px) {
-          .projects-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .projects-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .project-card-3d {
-            max-width: 400px;
-            margin: 0 auto;
-          }
-
-          .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            animation: none !important;
-            transition: none !important;
-          }
-          .project-card-inner {
-            transition: none !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
 
-export default Projects; // CHANGED: Now exporting Projects
+export default Projects;

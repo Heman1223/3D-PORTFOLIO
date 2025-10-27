@@ -19,34 +19,13 @@ function Hero() {
       <div className="hero-content">
         <div className="animated-text">
           <h1>
-            <b>KAPIL</b> KHANDELWAL IS THE{" "}
-            <b>
-              <i>REAL</i>
-            </b>{" "}
-            <span>STORY</span> IN THE{" "}
-            <span>
-              <i>METAVERSE.</i>
-            </span>
+            <b>KAPIL</b> KHANDELWAL
           </h1>
           <h1>
-            <b>KAPIL</b> KHANDELWAL IS THE{" "}
-            <b>
-              <i>REAL</i>
-            </b>{" "}
-            <span>STORY</span> IN THE{" "}
-            <span>
-              <i>METAVERSE.</i>
-            </span>
+            <b>KAPIL</b> KHANDELWAL
           </h1>
           <h1>
-            <b>KAPIL</b> KHANDELWAL IS THE{" "}
-            <b>
-              <i>REAL</i>
-            </b>{" "}
-            <span>STORY</span> IN THE{" "}
-            <span>
-              <i>METAVERSE.</i>
-            </span>
+            <b>KAPIL</b> KHANDELWAL
           </h1>
         </div>
         {/* <h3 className="hero-subtitle">
