@@ -60,7 +60,7 @@ function ThreeDModel() {
 
         img.src = `/video-frames/frame_${String(frameNumber).padStart(4, '0')}.jpg`;
 
-        console.log(`🔄 Loading: ${img.src}`);
+        console.log(`📄 Loading: ${img.src}`);
       });
     };
 
@@ -94,6 +94,7 @@ function ThreeDModel() {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
+    const isMobile = window.innerWidth <= 768;
 
     const setCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -106,7 +107,6 @@ function ThreeDModel() {
 
     setCanvasSize();
 
-    // Set canvas as hero background only
     canvas.style.position = "fixed";
     canvas.style.top = "0";
     canvas.style.left = "0";
@@ -133,16 +133,35 @@ function ThreeDModel() {
 
       let width, height, x, y;
 
-      if (imgRatio > canvasRatio) {
-        width = window.innerWidth;
-        height = width / imgRatio;
-        x = 0;
-        y = (window.innerHeight - height) / 2;
+      // MOBILE FIX: Use cover behavior to ensure full image is visible
+      if (window.innerWidth <= 768) {
+        // On mobile, cover the entire viewport
+        if (imgRatio > canvasRatio) {
+          // Image is wider - fit to height
+          height = window.innerHeight;
+          width = height * imgRatio;
+          x = (window.innerWidth - width) / 2;
+          y = 0;
+        } else {
+          // Image is taller - fit to width
+          width = window.innerWidth;
+          height = width / imgRatio;
+          x = 0;
+          y = (window.innerHeight - height) / 2;
+        }
       } else {
-        height = window.innerHeight;
-        width = height * imgRatio;
-        x = (window.innerWidth - width) / 2;
-        y = 0;
+        // Desktop behavior - same as before
+        if (imgRatio > canvasRatio) {
+          width = window.innerWidth;
+          height = width / imgRatio;
+          x = 0;
+          y = (window.innerHeight - height) / 2;
+        } else {
+          height = window.innerHeight;
+          width = height * imgRatio;
+          x = (window.innerWidth - width) / 2;
+          y = 0;
+        }
       }
 
       ctx.imageSmoothingEnabled = true;
@@ -172,22 +191,19 @@ function ThreeDModel() {
       const aboutTop = aboutSection.offsetTop;
       const aboutHeight = aboutSection.offsetHeight;
 
-      // Calculate when to start fading out (when about section comes into view)
-      const fadeStart = heroTop + heroHeight * 0.5; // Start fade 50% through hero
-      const fadeEnd = aboutTop + aboutHeight * 0.8; // Complete fade 80% through about section
+      const fadeStart = heroTop + heroHeight * 0.5;
+      const fadeEnd = aboutTop + aboutHeight * 0.8;
       const fadeDistance = fadeEnd - fadeStart;
 
       let opacity = 1;
 
       if (scrollTop > fadeStart) {
-        // Gradually fade out canvas through about section
         opacity = Math.max(0, 1 - (scrollTop - fadeStart) / fadeDistance);
         setCanvasOpacity(opacity);
       } else {
         setCanvasOpacity(1);
       }
 
-      // Only animate frames within hero section
       if (scrollTop < aboutTop) {
         const maxScroll = Math.max(0, aboutTop - heroTop);
         let progress = 0;
