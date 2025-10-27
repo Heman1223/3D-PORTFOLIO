@@ -34,95 +34,91 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-x: hidden;
   width: 100%;
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-x: hidden;
   font-weight: 400;
   transition: background-color 0.5s ease, color 0.5s ease;
   width: 100%;
-  max-width: 100vw; /* CRITICAL: Prevent body from exceeding viewport */
+  max-width: 100vw;
 }
 
 /* Apply Sora font to all headings */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Sora", sans-serif;
 }
 
 .App {
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-x: hidden;
   max-width: 100vw;
 }
 
-/* Add to global.css to center all section titles */
-.section-title {
-  text-align: center;
-  font-family: "Sora", sans-serif;
-}
-
-.section-label {
-  text-align: center;
-  font-family: "Inter", sans-serif;
-}
-
-/* Professional Section Styling - Reduced Spacing */
+/* REDUCED SECTION PADDING */
 section {
   min-height: 100vh;
-  padding: 80px 20px;
+  padding: 40px 20px; /* REDUCED from 80px */
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: background-color 0.5s ease;
   width: 100%;
-  max-width: 100vw; /* CRITICAL */
-  overflow-x: hidden; /* CRITICAL */
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.section-title {
+  text-align: center;
+  font-family: "Sora", sans-serif;
+  font-size: 42px; /* REDUCED from 48px */
+  line-height: 1.2;
+  margin-bottom: 20px; /* REDUCED from 30px */
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .section-label {
+  text-align: center;
   font-family: "Inter", sans-serif;
   color: var(--accent-tertiary);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 12px; /* REDUCED from 15px */
   display: block;
-}
-
-.section-title {
-  font-family: "Sora", serif;
-  font-size: 48px;
-  line-height: 1.2;
-  margin-bottom: 30px;
-  color: var(--text-primary);
-  font-weight: 600;
-  letter-spacing: -0.5px;
 }
 
 .section-subtitle {
   font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-size: 16px; /* REDUCED from 18px */
   color: var(--text-secondary);
   line-height: 1.5;
   max-width: 600px;
   font-weight: 400;
 }
 
-/* Professional Card Styling - Reduced Spacing */
+/* REDUCED Professional Card Spacing */
 .professional-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   border-radius: 12px;
-  padding: 30px;
+  padding: 20px; /* REDUCED from 30px */
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow-soft);
   transition: all 0.3s ease;
@@ -152,10 +148,10 @@ section {
   opacity: 1;
 }
 
-/* Professional Button Styling - Reduced Spacing */
+/* Professional Button Styling */
 .professional-btn {
   font-family: "Inter", sans-serif;
-  padding: 14px 28px;
+  padding: 12px 24px; /* REDUCED from 14px 28px */
   background: var(--gradient-primary);
   color: white;
   border: none;
@@ -208,10 +204,10 @@ section {
   color: white;
 }
 
-/* Single Line Centered Footer - Same Row Always */
+/* Single Line Centered Footer */
 .footer {
   background-color: var(--bg-secondary);
-  padding: 15px 20px;
+  padding: 12px 20px; /* REDUCED from 15px */
   text-align: center;
   border-top: 1px solid var(--border-light);
   width: 100%;
@@ -224,7 +220,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 25px; /* REDUCED from 30px */
 }
 
 .footer-content p {
@@ -236,7 +232,7 @@ section {
 
 .social-links {
   display: flex;
-  gap: 20px;
+  gap: 15px; /* REDUCED from 20px */
 }
 
 .social-links a {
@@ -251,61 +247,40 @@ section {
   color: var(--accent-tertiary);
 }
 
+/* REDUCED spacing for mobile */
 @media (max-width: 768px) {
+  section {
+    padding: 30px 15px; /* Even less on mobile */
+    min-height: auto; /* Allow natural height on mobile */
+  }
+
+  .section-title {
+    font-size: 32px; /* Smaller on mobile */
+    margin-bottom: 15px;
+  }
+
+  .section-label {
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+
+  .professional-card {
+    padding: 15px; /* Even less padding on mobile */
+  }
+
   .footer {
-    padding: 12px 15px;
+    padding: 10px 15px;
   }
 
   .footer-content {
     gap: 20px;
-    flex-wrap: nowrap;
-  }
-
-  .footer-content p {
-    font-size: 13px;
-  }
-
-  .social-links {
-    gap: 15px;
-  }
-
-  .social-links a {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-content {
-    gap: 15px;
-  }
-
-  .footer-content p {
-    font-size: 12px;
-  }
-
-  .social-links a {
-    font-size: 12px;
-  }
-}
-
-/* For extremely small screens, reduce gap but keep same row */
-@media (max-width: 360px) {
-  .footer-content {
-    gap: 10px;
-  }
-
-  .footer-content p {
-    font-size: 11px;
-  }
-
-  .social-links a {
-    font-size: 11px;
   }
 }
 
 /* Smooth transitions for theme changes */
 * {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Cursor styles - hide default cursor ONLY on desktop */
@@ -348,107 +323,6 @@ video {
   }
 }
 
-/* Glow effect utility */
-.glow {
-  box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
-  animation: glowPulse 2s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(74, 144, 226, 0.8);
-  }
-}
-
-/* Shimmer effect for loading states */
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(74, 144, 226, 0.2),
-    transparent
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Floating animation for particles */
-.floating {
-  animation: floating 3s ease-in-out infinite;
-}
-
-@keyframes floating {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-/* Scale on hover utility */
-.scale-hover {
-  transition: transform 0.3s ease;
-}
-
-.scale-hover:hover {
-  transform: scale(1.05);
-}
-
-/* Gradient text utility */
-.gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Card hover effect */
-.card-hover-effect {
-  position: relative;
-  overflow: hidden;
-}
-
-.card-hover-effect::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(74, 144, 226, 0.1),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.card-hover-effect:hover::before {
-  left: 100%;
-}
-
-/* Prevent text selection during animations */
-.no-select {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
 /* Performance optimization for animations */
 .will-change-transform {
   will-change: transform;
@@ -463,4 +337,18 @@ video {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+/* MOBILE PERFORMANCE OPTIMIZATIONS */
+@media (max-width: 768px) {
+  /* Disable heavy effects on mobile */
+  .professional-card::before,
+  .professional-btn::before {
+    display: none;
+  }
+
+  /* Reduce blur effects on mobile for performance */
+  .professional-card {
+    backdrop-filter: none;
+  }
 }

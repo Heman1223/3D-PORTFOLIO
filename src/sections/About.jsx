@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
 import CountUp from 'react-countup';
@@ -7,10 +7,19 @@ import "../styles/about.css";
 
 function About() {
   const [activeExp, setActiveExp] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const [statsRef, statsInView] = useInView({
     threshold: 0.3,
     triggerOnce: true,
   });
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const achievements = [
     { number: 7, suffix: "L+", label: "Business Consultations", Icon: Briefcase, color: "#4A90E2" },
@@ -40,43 +49,48 @@ function About() {
     },
   ];
 
+  // Mobile-optimized animations
   const cardVariants = {
-    hidden: { scale: 0, rotate: -180, opacity: 0 },
+    hidden: { 
+      scale: 0, 
+      rotate: isMobile ? -90 : -180, 
+      opacity: 0 
+    },
     visible: (i) => ({
       scale: 1,
       rotate: 0,
       opacity: 1,
       transition: {
-        delay: i * 0.15,
+        delay: i * (isMobile ? 0.08 : 0.15), // Faster on mobile
         type: "spring",
-        stiffness: 100,
-        damping: 12,
+        stiffness: isMobile ? 80 : 100, // Softer on mobile
+        damping: isMobile ? 15 : 12,
       }
     })
   };
 
   const experienceVariants = {
-    hidden: { opacity: 0, x: -50 },
+    hidden: { opacity: 0, x: isMobile ? -20 : -50 },
     visible: (i) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: i * 0.2,
-        duration: 0.5,
+        delay: i * (isMobile ? 0.1 : 0.2),
+        duration: isMobile ? 0.4 : 0.5,
         type: "spring",
       }
     })
   };
 
   const highlightVariants = {
-    hidden: { opacity: 0, rotateY: -20, scale: 0.9 },
+    hidden: { opacity: 0, rotateY: isMobile ? -10 : -20, scale: 0.9 },
     visible: (i) => ({
       opacity: 1,
       rotateY: 0,
       scale: 1,
       transition: {
-        delay: i * 0.2,
-        duration: 0.6,
+        delay: i * (isMobile ? 0.1 : 0.2),
+        duration: isMobile ? 0.4 : 0.6,
         type: "spring",
       }
     })
@@ -88,10 +102,10 @@ function About() {
         {/* Animated Header Section */}
         <motion.div 
           className="about-header"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: isMobile ? 30 : 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: isMobile ? 0.4 : 0.6 }}
         >
           <motion.h3 
             className="section-label"
@@ -139,20 +153,20 @@ function About() {
                 initial="hidden"
                 animate={statsInView ? "visible" : "hidden"}
                 variants={cardVariants}
-                whileHover={{ 
+                whileHover={!isMobile ? { 
                   y: -10,
                   scale: 1.03,
-                }}
+                } : {}}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 {/* Professional Icon with Gradient Background */}
                 <motion.div
                   className="achievement-icon-wrapper"
-                  initial={{ scale: 0, rotate: -180 }}
+                  initial={{ scale: 0, rotate: isMobile ? -90 : -180 }}
                   animate={statsInView ? { scale: [0, 1.2, 1], rotate: 0 } : { scale: 0 }}
-                  transition={{ delay: index * 0.15 + 0.3, duration: 0.6 }}
+                  transition={{ delay: index * (isMobile ? 0.08 : 0.15) + 0.3, duration: 0.6 }}
                 >
-                  <IconComponent size={40} color="white" strokeWidth={2} />
+                  <IconComponent size={isMobile ? 32 : 40} color="white" strokeWidth={2} />
                 </motion.div>
 
                 {/* CountUp Number */}
@@ -160,14 +174,14 @@ function About() {
                   className="achievement-number-wrapper"
                   initial={{ scale: 0 }}
                   animate={statsInView ? { scale: 1 } : { scale: 0 }}
-                  transition={{ delay: index * 0.15 + 0.5, type: "spring" }}
+                  transition={{ delay: index * (isMobile ? 0.08 : 0.15) + 0.5, type: "spring" }}
                 >
                   <span className="achievement-number">
                     {statsInView && (
                       <CountUp
                         end={achievement.number}
-                        duration={2.5}
-                        delay={index * 0.15}
+                        duration={isMobile ? 1.5 : 2.5} // Faster on mobile
+                        delay={index * (isMobile ? 0.08 : 0.15)}
                         suffix={achievement.suffix}
                       />
                     )}
@@ -178,7 +192,7 @@ function About() {
                   className="achievement-label"
                   initial={{ opacity: 0 }}
                   animate={statsInView ? { opacity: 1 } : { opacity: 0 }}
-                  transition={{ delay: index * 0.15 + 0.7 }}
+                  transition={{ delay: index * (isMobile ? 0.08 : 0.15) + 0.7 }}
                 >
                   {achievement.label}
                 </motion.span>
@@ -191,10 +205,10 @@ function About() {
         <div className="about-content">
           <motion.div 
             className="content-left"
-            initial={{ opacity: 0, x: -100 }}
+            initial={{ opacity: 0, x: isMobile ? -50 : -100 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: isMobile ? 0.4 : 0.6 }}
           >
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -217,19 +231,20 @@ function About() {
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={experienceVariants}
-                    onMouseEnter={() => setActiveExp(index)}
-                    whileHover={{ x: 10, scale: 1.02 }}
+                    onMouseEnter={!isMobile ? () => setActiveExp(index) : undefined}
+                    onClick={isMobile ? () => setActiveExp(activeExp === index ? -1 : index) : undefined}
+                    whileHover={!isMobile ? { x: 10, scale: 1.02 } : {}}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <motion.div 
                       className="experience-icon"
-                      whileHover={{ 
+                      whileHover={!isMobile ? { 
                         rotate: 360,
                         scale: 1.15,
-                      }}
+                      } : {}}
                       transition={{ duration: 0.5 }}
                     >
-                      <IconComponent size={24} color="white" strokeWidth={2} />
+                      <IconComponent size={isMobile ? 20 : 24} color="white" strokeWidth={2} />
                     </motion.div>
                     
                     <div className="experience-content">
@@ -270,10 +285,10 @@ function About() {
 
           <motion.div 
             className="content-right"
-            initial={{ opacity: 0, x: 100 }}
+            initial={{ opacity: 0, x: isMobile ? 50 : 100 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: isMobile ? 0.4 : 0.6 }}
           >
             {/* Enhanced Book Highlight */}
             <motion.div 
@@ -283,23 +298,23 @@ function About() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={highlightVariants}
-              whileHover={{ 
+              whileHover={!isMobile ? { 
                 scale: 1.02,
                 y: -5,
-              }}
+              } : {}}
             >
               <motion.div
                 className="highlight-icon-wrapper"
-                animate={{
+                animate={!isMobile ? {
                   y: [0, -8, 0],
-                }}
-                transition={{
+                } : {}}
+                transition={!isMobile ? {
                   duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut",
-                }}
+                } : {}}
               >
-                <BookOpen size={36} color="white" strokeWidth={2} />
+                <BookOpen size={isMobile ? 28 : 36} color="white" strokeWidth={2} />
               </motion.div>
               
               <h3>Author: "The Startup Summary"</h3>
@@ -310,17 +325,19 @@ function About() {
               </p>
 
               {/* Decorative Corner */}
-              <motion.div 
-                className="corner-decoration"
-                animate={{
-                  rotate: 360,
-                }}
-                transition={{
-                  duration: 20,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
+              {!isMobile && (
+                <motion.div 
+                  className="corner-decoration"
+                  animate={{
+                    rotate: 360,
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              )}
             </motion.div>
 
             {/* Enhanced Success Stories */}
@@ -331,23 +348,23 @@ function About() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={highlightVariants}
-              whileHover={{ 
+              whileHover={!isMobile ? { 
                 scale: 1.02,
                 y: -5,
-              }}
+              } : {}}
             >
               <motion.div
                 className="highlight-icon-wrapper"
-                animate={{
+                animate={!isMobile ? {
                   rotate: [0, 10, -10, 0],
-                }}
-                transition={{
+                } : {}}
+                transition={!isMobile ? {
                   duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut",
-                }}
+                } : {}}
               >
-                <Target size={36} color="white" strokeWidth={2} />
+                <Target size={isMobile ? 28 : 36} color="white" strokeWidth={2} />
               </motion.div>
               
               <h3>Proven Results</h3>
@@ -359,17 +376,19 @@ function About() {
               </p>
 
               {/* Decorative Corner */}
-              <motion.div 
-                className="corner-decoration"
-                animate={{
-                  rotate: -360,
-                }}
-                transition={{
-                  duration: 20,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
+              {!isMobile && (
+                <motion.div 
+                  className="corner-decoration"
+                  animate={{
+                    rotate: -360,
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              )}
             </motion.div>
           </motion.div>
         </div>
@@ -377,23 +396,23 @@ function About() {
         {/* Animated CTA Section */}
         <motion.div 
           className="cta-section"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: isMobile ? 0.4 : 0.6 }}
         >
           <motion.div
             className="cta-icon-wrapper"
-            animate={{
+            animate={!isMobile ? {
               scale: [1, 1.08, 1],
-            }}
-            transition={{
+            } : {}}
+            transition={!isMobile ? {
               duration: 2.5,
               repeat: Infinity,
               ease: "easeInOut",
-            }}
+            } : {}}
           >
-            <Award size={40} color="white" strokeWidth={2} />
+            <Award size={isMobile ? 32 : 40} color="white" strokeWidth={2} />
           </motion.div>
           
           <p className="cta-text">

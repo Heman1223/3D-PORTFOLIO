@@ -1,48 +1,57 @@
-import React, { useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useInView } from 'react-intersection-observer';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import "../styles/projects.css";
 
 function Projects() {
   const [flippedCard, setFlippedCard] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [ref, inView] = useInView({
     threshold: 0.2,
     triggerOnce: true,
   });
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const projects = [
     {
-      title: "Rohtak Shoe Company",
+      title: "The Rohtak Shoe Company",
       description:
-        "Modern shoe retail store offering premium footwear collection with a blend of style and comfort. A destination for shoe enthusiasts.",
+        "A growing footwear brand founded with a vision to deliver comfort, style, and durability in every step. What started as a small local initiative has evolved into a trusted name known for crafting high-quality shoes using premium materials and innovative designs.",
       video: "/videos/project1.mp4",
       stats: {
-        products: "500+",
-        customers: "5K+",
-        rating: "4.9/5",
-      }
+        episodes: "50+",
+        downloads: "100K+",
+        rating: "4.8/5",
+      },
     },
     {
-      title: "Heart Health",
+      title: "Holy Heart",
       description:
-        "Comprehensive cardiac healthcare website providing specialized cardiovascular services with state-of-the-art technology and expert care.",
+        "Built on the belief that every heartbeat matters, the center combines modern medical technology with expert cardiologists to deliver world-class patient care.",
       video: "/videos/project2.mp4",
       stats: {
-        patients: "1000+",
-        services: "15+",
-        satisfaction: "98%",
-      }
+        clients: "200+",
+        growth: "40%",
+        satisfaction: "95%",
+      },
     },
     {
-      title: "Rohtak Shoe Co.",
+      title: "SSJ – Electronics & Home Décor Gifts",
       description:
-        "Next-generation smart shoe store revolutionizing footwear retail with innovative designs and modern shopping experience.",
+        "The website brings together functionality and aesthetics, featuring a wide range of products from the latest gadgets to elegant decorative pieces that elevate any living space.",
       video: "/videos/project3.mp4",
       stats: {
-        designs: "300+",
-        sales: "+85%",
-        reach: "50K+",
-      }
+        brands: "75+",
+        engagement: "+60%",
+        reach: "500K+",
+      },
     },
   ];
 
@@ -52,66 +61,49 @@ function Projects() {
       triggerOnce: true,
     });
 
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const rotateX = useTransform(y, [-100, 100], [10, -10]);
-    const rotateY = useTransform(x, [-100, 100], [-10, 10]);
-
-    const handleMouseMove = (e) => {
-      if (flippedCard === index) return;
-      if (window.innerWidth <= 768) return; // Disable on mobile
-      
-      const rect = e.currentTarget.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      
-      x.set(e.clientX - centerX);
-      y.set(e.clientY - centerY);
-    };
-
-    const handleMouseLeave = () => {
-      x.set(0);
-      y.set(0);
-    };
-
     const isFlipped = flippedCard === index;
+
+    const handleCardClick = () => {
+      // Only flip the clicked card
+      setFlippedCard(isFlipped ? null : index);
+    };
 
     return (
       <motion.div
         ref={cardRef}
-        className="project-card-3d"
-        initial={{ opacity: 0, y: 100, rotateX: -20 }}
-        animate={cardInView ? { 
-          opacity: 1, 
-          y: 0,
-          rotateX: 0,
-        } : {}}
-        transition={{ 
+        className={`project-card-3d ${isFlipped ? "flipped" : ""}`}
+        initial={{ opacity: 0, y: isMobile ? 50 : 100 }}
+        animate={
+          cardInView
+            ? {
+                opacity: 1,
+                y: 0,
+              }
+            : {}
+        }
+        transition={{
           delay: index * 0.15,
-          duration: 0.8,
+          duration: 0.6,
           type: "spring",
           stiffness: 100,
         }}
-        style={{
-          perspective: window.innerWidth > 768 ? 1000 : 'none',
-        }}
       >
-        <motion.div
-          className="project-card-inner"
-          style={{
-            rotateX: window.innerWidth > 768 && !isFlipped ? rotateX : 0,
-            rotateY: window.innerWidth > 768 ? (isFlipped ? 180 : rotateY) : 0,
-            transformStyle: window.innerWidth > 768 ? "preserve-3d" : "flat",
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          onClick={() => setFlippedCard(isFlipped ? null : index)}
-          whileHover={window.innerWidth > 768 ? { scale: isFlipped ? 1 : 1.02 } : {}}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-          {/* Front of card */}
-          <div className="project-card-face project-card-front">
+        <div className="project-card-inner" onClick={handleCardClick}>
+          {/* Front of card - ALWAYS VISIBLE unless flipped */}
+          <motion.div
+            className="project-card-face project-card-front"
+            initial={false}
+            animate={{
+              opacity: isFlipped ? 0 : 1,
+              rotateY: isFlipped ? 90 : 0,
+              scale: isFlipped ? 0.9 : 1,
+            }}
+            transition={{ duration: 0.4, type: "spring" }}
+            style={{
+              position: isFlipped ? "absolute" : "relative",
+              zIndex: isFlipped ? 1 : 2,
+            }}
+          >
             <div className="project-header">
               <h2>{project.title}</h2>
             </div>
@@ -123,74 +115,77 @@ function Projects() {
                 muted
                 loop
                 playsInline
+                preload="metadata"
               >
                 <source src={project.video} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
 
-              <motion.div 
-                className="flip-hint"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.6, 1, 0.6],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                }}
-              >
-                Click to flip →
-              </motion.div>
+              {!isMobile && (
+                <motion.div
+                  className="flip-hint"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.6, 1, 0.6],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                  }}
+                >
+                  Click to flip →
+                </motion.div>
+              )}
+
+              {isMobile && (
+                <div className="mobile-flip-hint">Tap for details</div>
+              )}
             </div>
 
             <div className="project-footer">
               <p className="project-description">{project.description}</p>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Back of card */}
-          <div className="project-card-face project-card-back">
-            <motion.div
-              className="stats-container"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isFlipped ? 1 : 0 }}
-              transition={{ delay: 0.3 }}
-            >
+          {/* Back of card - ONLY VISIBLE when flipped */}
+          <motion.div
+            className="project-card-face project-card-back"
+            initial={false}
+            animate={{
+              opacity: isFlipped ? 1 : 0,
+              rotateY: isFlipped ? 0 : -90,
+              scale: isFlipped ? 1 : 0.9,
+            }}
+            transition={{ duration: 0.4, type: "spring" }}
+            style={{
+              position: isFlipped ? "relative" : "absolute",
+              zIndex: isFlipped ? 2 : 1,
+            }}
+          >
+            <div className="stats-container">
               <h3>Project Impact</h3>
-              
+
               <div className="stats-grid">
                 {Object.entries(project.stats).map(([key, value], i) => (
                   <motion.div
                     key={key}
                     className="stat-item"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={isFlipped ? { 
-                      scale: 1, 
-                      rotate: 0,
-                    } : {}}
-                    transition={{ 
-                      delay: 0.4 + i * 0.1,
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={
+                      isFlipped
+                        ? {
+                            scale: 1,
+                            opacity: 1,
+                          }
+                        : {}
+                    }
+                    transition={{
+                      delay: 0.2 + i * 0.1,
                       type: "spring",
                       stiffness: 200,
                     }}
                   >
-                    <motion.div 
-                      className="stat-value"
-                      animate={isFlipped ? {
-                        textShadow: [
-                          "0 0 10px rgba(74, 144, 226, 0)",
-                          "0 0 20px rgba(74, 144, 226, 0.8)",
-                          "0 0 10px rgba(74, 144, 226, 0)",
-                        ],
-                      } : {}}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                      }}
-                    >
-                      {value}
-                    </motion.div>
+                    <div className="stat-value">{value}</div>
                     <div className="stat-label">
                       {key.charAt(0).toUpperCase() + key.slice(1)}
                     </div>
@@ -200,7 +195,7 @@ function Projects() {
 
               <motion.button
                 className="back-button"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: !isMobile ? 1.05 : 1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -209,9 +204,9 @@ function Projects() {
               >
                 ← Back to Project
               </motion.button>
-            </motion.div>
-          </div>
-        </motion.div>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
     );
   };
