@@ -254,23 +254,17 @@
     min-height: 400px;
     max-width: 100%;
     margin: 0 auto;
-    perspective: 1000px; /* Enable perspective for flip effect */
   }
 
   .project-card-inner {
-    /* Enable 3D transform for flip on mobile */
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
+    /* Disable 3D effects on mobile for better performance */
+    transform: none !important;
   }
 
   .project-card-front,
   .project-card-back {
-    position: absolute;
-    backface-visibility: hidden;
-  }
-
-  .project-card-back {
-    transform: rotateY(180deg);
+    position: relative;
+    transform: none !important;
   }
 
   .video-container {
@@ -298,18 +292,14 @@
   }
 
   /* Stats on mobile */
-  .stats-container {
-    padding: 20px;
-  }
-
   .stats-container h3 {
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 20px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 15px;
     margin-bottom: 20px;
   }
 
@@ -318,17 +308,58 @@
   }
 
   .stat-value {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .stat-label {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .back-button {
     padding: 10px 20px;
     font-size: 13px;
-    width: 100%;
-    max-width: 200px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .projects {
+    padding: 50px 10px;
+  }
+
+  .project-card-3d {
+    min-height: 380px;
+  }
+
+  .video-container {
+    height: 180px;
+  }
+
+  .project-header h2 {
+    font-size: 16px;
+  }
+
+  .project-description {
+    font-size: 12px;
+  }
+
+  .stats-container h3 {
+    font-size: 20px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .project-card-inner {
+    transition: none !important;
   }
 }
