@@ -34,9 +34,9 @@ async function optimizeFramesUltra() {
 
       // Create mobile-optimized (medium quality)
       await sharp(inputPath)
-        .resize(720, 405) // 16:9 ratio, smaller size
+        .resize(1280, 720) // 16:9 ratio, smaller size
         .jpeg({
-          quality: 75, // Medium quality
+          quality: 80, // Medium quality
           mozjpeg: true,
           progressive: true,
         })
@@ -46,9 +46,9 @@ async function optimizeFramesUltra() {
 
       // Create mobile-low (ultra low quality for slow devices)
       await sharp(inputPath)
-        .resize(540, 304) // Very small size
+        .resize(960, 540) // Very small size
         .jpeg({
-          quality: 55, // Very low quality
+          quality: 60, // Very low quality
           mozjpeg: true,
           progressive: true,
         })
