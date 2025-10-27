@@ -26,9 +26,9 @@ function Projects() {
         "A growing footwear brand founded with a vision to deliver comfort, style, and durability in every step. What started as a small local initiative has evolved into a trusted name known for crafting high-quality shoes using premium materials and innovative designs.",
       video: "/videos/project1.mp4",
       stats: {
-        episodes: "50+",
-        downloads: "100K+",
-        rating: "4.8/5",
+        products: "500+",
+        customers: "5K+",
+        rating: "4.9/5",
       },
     },
     {
@@ -37,9 +37,9 @@ function Projects() {
         "Built on the belief that every heartbeat matters, the center combines modern medical technology with expert cardiologists to deliver world-class patient care.",
       video: "/videos/project2.mp4",
       stats: {
-        clients: "200+",
-        growth: "40%",
-        satisfaction: "95%",
+        patients: "1000+",
+        services: "15+",
+        satisfaction: "98%",
       },
     },
     {
@@ -50,7 +50,7 @@ function Projects() {
       stats: {
         brands: "75+",
         engagement: "+60%",
-        reach: "500K+",
+        reach: "10K+",
       },
     },
   ];

@@ -15,9 +15,9 @@ function Contact() {
 
   // Your actual contact information - UPDATE THESE WITH YOUR REAL INFO
   const contactInfo = {
-    email: "harleenk7209@gmail.com", // Replace with your real email
-    phone: "+917743040191", // Replace with your real phone number (with country code)
-    whatsapp: "+917743040191", // Replace with your real WhatsApp number
+    email: "kp@avanienterprises.in", // Replace with your real email
+    phone: "+919253625099", // Replace with your real phone number (with country code)
+    whatsapp: "+919253625099", // Replace with your real WhatsApp number
     address: "Block C - sector 49 gurugram",
   };
 
