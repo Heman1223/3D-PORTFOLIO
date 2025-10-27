@@ -12,36 +12,36 @@ function Projects() {
 
   const projects = [
     {
-      title: "Business Podcast Series",
+      title: "Rohtak Shoe Company",
       description:
-        "Comprehensive podcast series helping startups with growth strategies and founder stories. Featured interviews with successful entrepreneurs.",
+        "Modern shoe retail store offering premium footwear collection with a blend of style and comfort. A destination for shoe enthusiasts.",
       video: "/videos/project1.mp4",
       stats: {
-        episodes: "50+",
-        downloads: "100K+",
-        rating: "4.8/5",
+        products: "500+",
+        customers: "5K+",
+        rating: "4.9/5",
       }
     },
     {
-      title: "Startup Consultation",
+      title: "Heart Health",
       description:
-        "Digital platform connecting startups with business consultants for personalized guidance and strategic growth planning.",
+        "Comprehensive cardiac healthcare website providing specialized cardiovascular services with state-of-the-art technology and expert care.",
       video: "/videos/project2.mp4",
       stats: {
-        clients: "200+",
-        growth: "40%",
-        satisfaction: "95%",
+        patients: "1000+",
+        services: "15+",
+        satisfaction: "98%",
       }
     },
     {
-      title: "Founder Branding",
+      title: "Rohtak Shoe Co.",
       description:
-        "Complete personal branding package for business leaders including content strategy and market presence enhancement.",
+        "Next-generation smart shoe store revolutionizing footwear retail with innovative designs and modern shopping experience.",
       video: "/videos/project3.mp4",
       stats: {
-        brands: "75+",
-        engagement: "+60%",
-        reach: "500K+",
+        designs: "300+",
+        sales: "+85%",
+        reach: "50K+",
       }
     },
   ];
